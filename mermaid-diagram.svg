@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1093.7514999999999 1264.53" width="1093.7514999999999" height="1264.53" style="--bg:#FFFFFF;--fg:#1E293B;--line:#64748B;--muted:#475569;--surface:#F8FAFC;--border:#CBD5E1;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<polyline class="edge" data-from="A" data-to="B" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="523.106,76.9 523.1059999999999,124.9" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="B" data-to="C" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="523.1059999999999,178.70000000000002 523.1059999999999,226.70000000000002" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="C" data-to="GATE" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="523.1059999999999,280.5 523.1059999999999,328.5" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="GATE" data-to="PASS" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="✅ 100% 官方正品原廠狀態" points="463.3069999999999,468.03099999999995 463.3069999999999,677.63 111,677.63 111,802.2299999999999 175.69933333333347,802.2299999999999 175.69933333333347,814.2299999999999" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="GATE" data-to="REJ" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="❌ 檢出非官方特徵/假燙金/無防偽" points="503.1729999999999,507.89699999999993 503.1729999999999,689.63 347.101,689.63 347.101,802.2299999999999 473.38333333333327,802.2299999999999 473.38333333333327,814.2299999999999" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="GATE" data-to="ALT" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="⚠️ 檢出修邊/補色/壓痕抹平/重背拼裝" points="582.905,468.0309999999999 582.905,551.83 951.7694999999999,551.83 951.7694999999999,802.23 898.1782916666666,802.23 898.1782916666666,814.23" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="GATE" data-to="EXPERT" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="🔍 特徵處於公差臨界點" points="543.039,507.8969999999998 543.039,563.83 676.9179999999999,563.83 676.9179999999999,644.13" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="EXPERT" data-to="PASS" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="裁定真品" points="604.7422499999999,697.93 604.7422499999999,733.93 387.101,733.93 387.101,790.2299999999999 260.8186666666668,790.2299999999999 260.8186666666668,814.2299999999999" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="EXPERT" data-to="REJ" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="裁定假卡" points="676.9179999999999,697.93 676.9179999999999,733.93 655.1277499999999,733.93 655.1277499999999,802.2299999999999 572.8286666666665,802.2299999999999 572.8286666666665,814.2299999999999" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="EXPERT" data-to="ALT" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="裁定改卡" points="749.0937499999999,697.93 749.0937499999999,733.9300000000001 770.4879166666666,733.9300000000001 770.4879166666666,802.23 802.6849583333333,802.23 802.6849583333333,814.23" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="PASS" data-to="SCORE" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="218.25900000000013,868.0299999999999 218.25900000000001,916.0299999999999" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="SCORE" data-to="REVIEW" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="218.25900000000001,969.8299999999998 218.25900000000001,1017.8299999999998" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="REVIEW" data-to="PACK" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="218.25900000000001,1054.7299999999998 218.25900000000001,1102.7299999999998" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="PACK" data-to="WEB" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="218.25900000000001,1139.6299999999999 218.25900000000001,1187.6299999999999" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="GATE" data-to="PASS" data-label="✅ 100% 官方正品原廠狀態">
+  <rect x="36" y="740.93" width="149.518" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="110.759" y="756.0799999999999" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">✅ 100% 官方正品原廠狀態</text>
+</g>
+<g class="edge-label" data-from="GATE" data-to="REJ" data-label="❌ 檢出非官方特徵/假燙金/無防偽">
+  <rect x="251.101" y="696.63" width="191.69200000000004" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="346.947" y="711.78" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">❌ 檢出非官方特徵/假燙金/無防偽</text>
+</g>
+<g class="edge-label" data-from="GATE" data-to="ALT" data-label="⚠️ 檢出修邊/補色/壓痕抹平/重背拼裝">
+  <rect x="845.2694999999999" y="740.9300000000001" width="212.482" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="951.5104999999999" y="756.08" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">⚠️ 檢出修邊/補色/壓痕抹平/重背拼裝</text>
+</g>
+<g class="edge-label" data-from="GATE" data-to="EXPERT" data-label="🔍 特徵處於公差臨界點">
+  <rect x="607.4179999999999" y="570.83" width="138.23200000000003" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="676.5339999999999" y="585.98" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">🔍 特徵處於公差臨界點</text>
+</g>
+<g class="edge-label" data-from="EXPERT" data-to="PASS" data-label="裁定真品">
+  <rect x="354.101" y="740.93" width="65.17" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="386.686" y="756.0799999999999" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">裁定真品</text>
+</g>
+<g class="edge-label" data-from="EXPERT" data-to="REJ" data-label="裁定假卡">
+  <rect x="622.1277499999999" y="740.93" width="65.17" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="654.7127499999999" y="756.0799999999999" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">裁定假卡</text>
+</g>
+<g class="edge-label" data-from="EXPERT" data-to="ALT" data-label="裁定改卡">
+  <rect x="737.4879166666666" y="740.9300000000001" width="65.17" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="770.0729166666666" y="756.08" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">裁定改卡</text>
+</g>
+<g class="node" data-id="A" data-label="🎴 送評裸卡 入庫掃描" data-shape="rectangle">
+  <rect x="433.21799999999996" y="40" width="179.77599999999998" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="523.106" y="58.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">🎴 送評裸卡 入庫掃描</text>
+</g>
+<g class="node" data-id="B" data-label="📷 定製工業級 OCR 專業掃描工作站
+(雙面 5μm / 4重複合多光譜光源)" data-shape="rectangle">
+  <rect x="389.1284999999999" y="124.9" width="267.9549999999999" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="523.1059999999999" y="151.8" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="523.1059999999999" dy="-3.9000000000000012">📷 定製工業級 OCR 專業掃描工作站</tspan><tspan x="523.1059999999999" dy="16.900000000000002">(雙面 5μm / 4重複合多光譜光源)</tspan></text>
+</g>
+<g class="node" data-id="C" data-label="🔍 幾何透視畸變校正 &amp; 結構化 OCR
+(卡名/系列/編號/微縮防偽印記抽取)" data-shape="rectangle">
+  <rect x="389.1284999999999" y="226.70000000000002" width="267.9549999999999" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="523.1059999999999" y="253.60000000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="523.1059999999999" dy="-3.9000000000000012">🔍 幾何透視畸變校正 &amp; 結構化 OCR</tspan><tspan x="523.1059999999999" dy="16.900000000000002">(卡名/系列/編號/微縮防偽印記抽取)</tspan></text>
+</g>
+<g class="node" data-id="GATE" data-label="🛑 核心前置閘門
+真偽鑑別與改卡排查
+(Authenticity Gate)" data-shape="diamond">
+  <polygon points="523.1059999999999,328.5 622.7709999999998,428.16499999999996 523.1059999999999,527.8299999999999 423.4409999999999,428.16499999999996" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="523.1059999999999" y="428.16499999999996" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="523.1059999999999" dy="-12.350000000000001">🛑 核心前置閘門</tspan><tspan x="523.1059999999999" dy="16.900000000000002">真偽鑑別與改卡排查</tspan><tspan x="523.1059999999999" dy="16.900000000000002">(Authenticity Gate)</tspan></text>
+</g>
+<g class="node" data-id="PASS" data-label="🟢 真品合格 (AUTHENTIC_PASSED)
+正式獲准進入品相打分流水線" data-shape="rectangle">
+  <rect x="90.58000000000015" y="814.2299999999999" width="255.3579999999999" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="218.2590000000001" y="841.1299999999999" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="218.2590000000001" dy="-3.9000000000000012">🟢 真品合格 (AUTHENTIC_PASSED)</tspan><tspan x="218.2590000000001" dy="16.900000000000002">正式獲准進入品相打分流水線</tspan></text>
+</g>
+<g class="node" data-id="REJ" data-label="🚫 贗品假卡 (REJECTED_COUNTERFEIT)
+終止評分，出具防偽特徵比對警報報告" data-shape="rectangle">
+  <rect x="373.93799999999993" y="814.2299999999999" width="298.33599999999996" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="523.1059999999999" y="841.1299999999999" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="523.1059999999999" dy="-3.9000000000000012">🚫 贗品假卡 (REJECTED_COUNTERFEIT)</tspan><tspan x="523.1059999999999" dy="16.900000000000002">終止評分，出具防偽特徵比對警報報告</tspan></text>
+</g>
+<g class="node" data-id="ALT" data-label="⚠️ 人為改卡 (AUTHENTIC_ALTERED)
+僅標註 AA 真品改裝，不發放數值評分" data-shape="rectangle">
+  <rect x="707.1916249999999" y="814.23" width="286.47999999999996" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="850.4316249999999" y="841.13" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="850.4316249999999" dy="-3.9000000000000012">⚠️ 人為改卡 (AUTHENTIC_ALTERED)</tspan><tspan x="850.4316249999999" dy="16.900000000000002">僅標註 AA 真品改裝，不發放數值評分</tspan></text>
+</g>
+<g class="node" data-id="EXPERT" data-label="👨‍🔬 兩名資深評級專家雙盲人眼複檢
+(QUESTIONABLE_AUTHENTICITY)" data-shape="rectangle">
+  <rect x="532.5664999999999" y="644.13" width="288.703" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="676.9179999999999" y="671.03" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="676.9179999999999" dy="-3.9000000000000012">👨‍🔬 兩名資深評級專家雙盲人眼複檢</tspan><tspan x="676.9179999999999" dy="16.900000000000002">(QUESTIONABLE_AUTHENTICITY)</tspan></text>
+</g>
+<g class="node" data-id="SCORE" data-label="🧠 AI 視覺神經網絡 4 大維度客觀量化打分
+(居中度 / 邊角銳度 / 邊緣品相 / 表面純淨度)" data-shape="rectangle">
+  <rect x="62.79250000000002" y="916.0299999999999" width="310.93299999999994" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="218.259" y="942.9299999999998" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="218.259" dy="-3.9000000000000012">🧠 AI 視覺神經網絡 4 大維度客觀量化打分</tspan><tspan x="218.259" dy="16.900000000000002">(居中度 / 邊角銳度 / 邊緣品相 / 表面純淨度)</tspan></text>
+</g>
+<g class="node" data-id="REVIEW" data-label="👨‍🔬 專家雙盲評審 &amp; 綜合定級 (Grade 10 ~ 1)" data-shape="rectangle">
+  <rect x="60.56950000000006" y="1017.8299999999998" width="315.3789999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="218.25900000000001" y="1036.2799999999997" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">👨‍🔬 專家雙盲評審 &amp; 綜合定級 (Grade 10 ~ 1)</text>
+</g>
+<g class="node" data-id="PACK" data-label="🛡️ 超聲波無縫卡磚封裝 &amp; NFC 晶片加密燒錄" data-shape="rectangle">
+  <rect x="53.52999999999997" y="1102.7299999999998" width="329.45799999999997" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="218.25899999999996" y="1121.1799999999998" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">🛡️ 超聲波無縫卡磚封裝 &amp; NFC 晶片加密燒錄</text>
+</g>
+<g class="node" data-id="WEB" data-label="🌐 Web 官網同步 (數位證書 DIF Report / 卡冊)" data-shape="rectangle">
+  <rect x="59.08750000000009" y="1187.6299999999999" width="318.34299999999996" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="218.25900000000007" y="1206.08" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">🌐 Web 官網同步 (數位證書 DIF Report / 卡冊)</text>
+</g>
+</svg>
