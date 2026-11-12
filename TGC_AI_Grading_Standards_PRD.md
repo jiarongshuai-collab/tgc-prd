@@ -29,24 +29,34 @@ TGC 建立了**「先真偽鑑別、後量化打分」**的兩階段核心業務
 
 ```mermaid
 flowchart TD
-    A["🎴 送評裸卡 入庫掃描"] --> B["📷 定製工業級 OCR 專業掃描工作站<br/>(雙面 5μm / 4重複合多光譜光源)"]
-    B --> C["🔍 幾何透視畸變校正 & 結構化 OCR<br/>(卡名/系列/編號/微縮防偽印記抽取)"]
+    A["🎴 送評裸卡 入庫掃描 (Inbound)"] --> B["📷 定製工業級專業掃描工作站<br/>(雙面 4K 高清 + 3D 光度立體浮雕)"]
+    B --> C["🔍 幾何透視畸變校正 & 結構化 OCR<br/>(卡名/系列/編號/微縮印記抽取)"]
     
-    C --> GATE{"🛑 核心前置閘門<br/>真偽鑑別與改卡排查<br/>(Authenticity Gate)"}
+    C --> GATE{"🛑 核心前置防偽閘門<br/>真偽鑑別與改卡排查<br/>(Authenticity Gate)"}
     
-    GATE -- "✅ 100% 官方正品原廠狀態" --> PASS["🟢 真品合格 (AUTHENTIC_PASSED)<br/>正式獲准進入品相打分流水線"]
-    GATE -- "❌ 檢出非官方特徵/假燙金/無防偽" --> REJ["🚫 贗品假卡 (REJECTED_COUNTERFEIT)<br/>終止評分，出具防偽特徵比對警報報告"]
-    GATE -- "⚠️ 檢出修邊/補色/壓痕抹平/重背拼裝" --> ALT["⚠️ 人為改卡 (AUTHENTIC_ALTERED)<br/>僅標註 AA 真品改裝，不發放數值評分"]
-    GATE -- "🔍 特徵處於公差臨界點" --> EXPERT["👨‍🔬 兩名資深評級專家雙盲人眼複檢<br/>(QUESTIONABLE_AUTHENTICITY)"]
+    GATE -- "✅ 官方正品原廠狀態" --> PASS["🟢 真品合格 (AUTHENTIC)<br/>正式獲准進入品相打分流水線"]
+    GATE -- "❌ 檢出非正品/假燙金/網點異常" --> REJ["🚫 贗品假卡 (COUNTERFEIT / E03)<br/>終止評分，貼『真偽存疑』標籤<br/>(嚴禁封裝，收取全額評級費不退)"]
+    GATE -- "⚠️ 檢出修邊/補色/壓痕熨平/改動" --> ALT{"⚠️ 人為改卡 (ALTERED / E04)<br/>凍結 1~10 數字分，費用不退<br/>讀取用戶 A10 封裝偏好"}
+    GATE -- "🔍 特徵處於公差臨界點" --> EXPERT["👨‍🔬 兩名資深評級專家雙盲人眼複檢<br/>(QUESTIONABLE / 4層微觀防線)"]
     
     EXPERT -- "裁定真品" --> PASS
     EXPERT -- "裁定假卡" --> REJ
     EXPERT -- "裁定改卡" --> ALT
 
-    PASS --> SCORE["🧠 AI 視覺神經網絡 4 大維度客觀量化打分<br/>(居中度 / 邊角銳度 / 邊緣品相 / 表面純淨度)"]
-    SCORE --> REVIEW["👨‍🔬 專家雙盲評審 & 綜合定級 (Grade 10 ~ 1)"]
-    REVIEW --> PACK["🛡️ 超聲波無縫卡磚封裝 & NFC 晶片加密燒錄"]
-    PACK --> WEB["🌐 Web 官網同步 (數位證書 DIF Report / 卡冊)"]
+    ALT -- "偏好 A: SLAB_AA (封裝)" --> SLAB_AA["🛡️ 封裝 Authentic Altered (AA) 認證卡磚<br/>(無數值分，專屬 AA 標籤)"]
+    ALT -- "偏好 B: RETURN_RAW (默認)" --> RAW_RET["📦 裸卡原樣隨訂單退回<br/>(RETURN_RAW)"]
+
+    PASS --> SCORE["🧠 AI 視覺神經網絡 4 大維度客觀量化打分<br/>(居中度 / 表面 / 四角 / 邊緣)"]
+    SCORE --> REVIEW["👨‍🔬 專家雙審 & 綜合定級 (Grade 10 ~ 1)"]
+    REVIEW --> PACK["🛡️ 超聲波無縫卡磚封裝 & 防偽標籤燒錄"]
+
+    PACK --> MERGE["📋 OMS 訂單合流 & 報告就緒 (READY_FOR_REVEAL)<br/>出具尾款通知單 (評級費+運費+Upcharge+理貨費)<br/>啟動 3 天爭議期倒計時"]
+    SLAB_AA --> MERGE
+    RAW_RET --> MERGE
+    REJ --> MERGE
+
+    MERGE --> DEBIT["💳 Stripe 銀行卡自動代扣<br/>(3天期滿無異議自動扣款 / 解鎖在線查分)"]
+    DEBIT --> SHIP["🚚 順豐保價特快回寄出庫 (SHIPPED & COMPLETED)"]
 ```
 
 ---
