@@ -1,6 +1,6 @@
 # TGC GMS（評級實驗室管理系統）MVP 版本產品需求文件 (PRD)
 
-> **所屬體系**：TGC 智能質檢評級流水線  
+> **所屬體系**：TGC (The Good Cherry / 櫻桃未來) 智能質檢評級流水線  
 > **關聯系統代碼**：`gms/frontend/gms.html` · `gms/system/gms_workflow.js` · `gms/system/authenticator.js` · `gms/system/ai_grader.js` · `gms/system/schema.sql`  
 > **標準規範手冊**：`gms/docs/TGC_卡牌评级核心三大支柱体系规范手册.md`  
 > **預設語言體系**：**English (en)** 與 **繁體中文 (zh-TW)** 雙語支援  
@@ -45,7 +45,7 @@ GMS (Grading Management System) 是面向 TGC 評級實驗室內部的**工業�
 | :--- | :---: | :---: | :---: |
 | **頂部切換與工作台視圖** | 專屬評級師工作台 (`list_grader`, 評級明細) | 經理看板 (`list_manager`, 任務派發, 隊列監控) | 全域視圖 (`account_access`, 硬件配置, 審計) |
 | **相機掃描控制與重拍** | 支援觸發採圖、標註重拍原因 | 支援強制放行機掃任務 | 完整相機參數調試、傳動驅動控制 |
-| **手動翻拍兜底上傳** | 允許翻拍上傳 | 允許審批翻拍圖像 | 允許設置翻拍標準參數 |
+| **機台故障調度與掃描重測 (H05/H06)** | 標記機台異常並轉移至備用掃描儀 | 審批調度任務與重測工單；**嚴禁手動翻拍評級** | 機台校準管理、鎖定異常機台與全量卡牌強制重掃 (H06) |
 | **AI 打分確認與手動調分** | **核心權限**：可微調分數並填寫改分原因 | 複核評級師調整記錄，仲裁分歧 | 具備全域修改權限 |
 | **假卡/改卡拒絕判定** | 標記疑似假卡，提交複審 | **核心權限**：審批假卡判定，出具拒評書 | 終審歸檔與法律存證管理 |
 | **任務分配與調度派工** | 僅能領取已指派工單 | **核心權限**：批量指派工單給特定評級師 | 具備最高排班與指派權限 |
@@ -99,22 +99,35 @@ GMS 系統原生支援即時切換 `English (en)` 與 `繁體中文 (zh-TW)`：
 [原始卡牌入機]
       │
       ▼
-【第一道防線：物理規格】 ──(尺寸公差 ±0.15mm, 厚度 0.28~0.32mm, 重量公差 ±0.05g)──> 異常則報警
+【第一道防線：物理規格】 ──(尺寸出廠公差 ±0.20mm, 厚度 0.28~0.32mm, 重量公差 ±0.10g)──> 短縮 ≥0.30mm 警報
       │
       ▼
-【第二道防線：夾層黑芯】 ──(透光反應 + 截面光學檢測：BLACK_CORE 黑芯層)────────> 白芯/透光不均直接判定假卡
+【第二道防線：夾層黑芯】 ──(透光反應 + 截面光學檢測：BLACK_CORE 黑芯層)────────> 白芯/透光不均判定假卡 (COUNTERFEIT)
       │
       ▼
-【第三道防線：印刷網點】 ──(高倍微距比對膠印 Rosette Pattern 玫瑰網點)───────────> 噴墨/數碼打印顆粒直接判定假卡
+【第三道防線：印刷網點】 ──(高倍微距比對膠印 Rosette Pattern 玫瑰網點)───────────> 噴墨/數碼打印顆粒判定假卡 (COUNTERFEIT)
       │
       ▼
-【第四道防線：微縮文字】 ──(高精度檢測版權字輪廓與特殊光學油墨)──────────────────> 筆畫糊連判定篡改
+【第四道防線：微縮文字】 ──(高精度檢測版權字輪廓與特殊光學油墨)──────────────────> 塗改/拼裝/重背判定改卡 (ALTERED)
 ```
 
-* **判定為假卡/篡改卡時的處理**：
-  1. GMS 立即終止後續評級打分，狀態標記為 `REJECTED_FAKE`。
-  2. 生成《不予評級存證書》（標註微觀對比不合格圖例與專家簽名）。
-  3. 扣留封裝外殼，卡片保留原始卡套，隨訂單一同退回。
+* **判定為假卡、改卡與不可評級卡牌的分流處置機制（嚴格對齊 Heidi 異常規範 E03 / E04 / A10 / E05 / E12 / E13 與三大支柱標準）**：
+  1. **假卡/偽造卡 (`COUNTERFEIT` / E03) 處置**：
+     * GMS 立即終止後續評級打分，狀態標記為 `REJECTED_FAKE`。
+     * 出具《未評級，真偽存疑（Did Not Grade, Questionable Authenticity）》標籤與防偽攔截記錄（標註微觀對比不合格圖例與專家簽名存證）。
+     * **不進行封裝 (Not slabbed)**。
+     * **收費與退款規則**：**收取全額評級費，不予退款**（E03 規定），不添加至用戶收藏夾（Portfolio）。卡片退回原包裝卡套，隨訂單其他正常卡牌一同回寄。
+  2. **人為改裝/篡改卡 (`ALTERED` / E04 / A10) 處置**：
+     * 卡牌確認為原廠正品基底，但遭受後天人為物理/化學改動（裁剪修邊 Trimming、補色描邊 Inking、壓平去折 Pressing、重噴光油 Resurfacing），歸類為 N-1、N-2 或 N-5。
+     * 狀態標記為 `AUTHENTIC_ALTERED`，**系統凍結數值評分（No Grade 1-10，不給予 1~10 數字分）**。
+     * **封裝處置**：**嚴格依照用戶在下單「服務」步驟（A10）設定的偏好 `altered_action_preference` 執行**：
+       - 若偏好為 `SLAB_AA`（封裝專屬卡磚）：封裝為專屬認證卡磚，標籤專屬標註 **`Authentic Altered (AA)`**。
+       - 若偏好為 `RETURN_RAW`（默認選項）：不予封裝，直接作為裸卡退回。
+     * **收費規則**：**費用不予退還**（E04 規定），不添加至用戶收藏夾。
+  3. **無法評級或嚴重翹曲卡牌 (E05 / E12 / E13) 處置**：
+     * **E05（卡牌過厚、已預先封裝、未拆封或卡夾不合規）**：作為裸卡退回，不收取評級費。若全單無卡可評，發送退回通知單收取退貨運費與 SPP。
+     * **E12（無法核實真偽）**：真偽鑑定結果不明確，不進行評級，隨訂單作為裸卡退回，不添加至收藏夾，收取全額評級費（同 E03）。
+     * **E13（嚴重彎曲或翹曲的卡牌）**：評級師無法拍攝出足夠清晰的照片以進行評級，不進行評級，**TGC 絕不對卡牌進行壓平或按壓處理**，隨訂單作為裸卡退回，不收取評級費（同 E05）。
 
 ---
 
@@ -126,16 +139,20 @@ $$\text{Grade}_{\text{Raw}} = 0.35 \times \text{Centering} + 0.25 \times \text{S
 #### 4.3.2 居中度（Centering）比例容差表
 * **正面 (Front Ratio)**：
   * Gem Mint 10: 允許在 $50/50 \sim 55/45$ 範圍內。
-  * Mint 9: 允許在 $60/40$ 範圍內。
-  * NM 8: 允許在 $65/35$ 範圍內。
+  * Mint+ 9.5: 允許在 $56/44 \sim 58/42$ 範圍內。
+  * Mint 9: 允許在 $59/41 \sim 60/40$ 範圍內。
+  * NM-MT 8: 允許在 $61/39 \sim 65/35$ 範圍內。
+  * EX 6 及以下: 偏心大於 $75/25$ 觸發 `OC` (Off-Center) 修飾符。
 * **背面 (Back Ratio)**：
-  * Gem Mint 10: 允許在 $60/40 \sim 75/25$ 範圍內。
+  * Gem Mint 10: 允許在 $50/50 \sim 75/25$ 範圍內。
+  * Mint 9: 允許在 $\le 80/20$ 範圍內。
 
 #### 4.3.3 硬性約束與封頂規則（Hard Override Constraints）
 為保證公信力，打分設有一票封頂機制：
-1. **折痕封頂 (Crease Cap)**：卡面若檢測到微小表面折痕，總分**強制封頂最高 6.0 分**；貫穿性深折痕**強制封頂 4.0 分**。
-2. **缺肉/孔洞封頂 (Paper Loss / Pinholes)**：強制封頂 **1.5 分**。
-3. **單項最差拖累規則 (Worst-Subgrade Penalty)**：最終總分不得高於「四項子分中最低分 $+ 1.0$ 分」（例如 Corners 得 7.0 分，總分最高不得超過 8.0 分）。
+1. **折痕封頂 (Crease Cap)**：卡面若檢測到微小表面折痕（Minor Crease $< 1\text{ inch}$），總分**強制封頂最高 5.0 (EX)**；貫穿性深折痕或多處折痕**強制封頂 4.0 (VG-EX)**。
+2. **正面壓痕封頂 (Front Dent Override)**：卡片正面肉眼可見凹痕/壓痕，強制封頂 **7.0 (Near Mint)**。
+3. **缺肉/孔洞封頂 (Paper Loss / Pinholes)**：強制封頂 **1.5 分**。
+4. **單項最差拖累規則 (Worst-Subgrade Penalty)**：最終總分不得高於「四項子分中最低分 $+ 1.0$ 分」（例如 Corners 得 7.0 分，總分最高不得超過 8.0 分）。
 
 ---
 
@@ -144,16 +161,21 @@ $$\text{Grade}_{\text{Raw}} = 0.35 \times \text{Centering} + 0.25 \times \text{S
 ### 5.1 定制相機機檢工位規格（硬件聯調專項）
 * **5.1.1 硬件通信架構**：
   * GMS 前端透過本地代理服務（WebSocket / Local HTTP `127.0.0.1:8989`）與定制相機主板驅動通信。
-  * 實時反饋狀態：頂部狀態欄綠燈展示 `Hardware Online (Active 120 FPS / 4K UHD)`。
-* **5.1.2 採圖流水線規格**：
-  * 一鍵觸發步進電機傳動進卡，依次切換光源採集：
-    1. 白光漫反射（正反面 4K 高保真無反光原圖）；
-    2. 45° 側射光（表面微觀壓痕、指紋、划痕立體浮雕圖）；
-    3. UV 紫外線光（全息防偽層、熒光劑殘留、人工補色辨識）；
-    4. 背光透射光（黑芯透光度測量）。
-* **5.1.3 硬件聯調期「手動翻拍兜底機制」**：
-  * 若傳動卡機、相機連線中斷或遇到超厚特殊卡磚，系統在 3 秒內提示「切換手動翻拍」。
-  * 操作員在翻拍台手動拍照上傳，GMS 調用軟體級算法自動進行透視變形校正與邊緣裁剪，確保業務不中斷。
+  * 實時反饋狀態：頂部狀態欄綠燈展示 `Hardware Online (Active 120 FPS / 4K UHD)`，畫布頂部顯示通道狀態 `微距雙通道 · 4K RGB + 3D光度立體 (Dual Optical Channels · 4K RGB + 3D Stereo)`。
+* **5.1.2 採圖流水線規格（雙面四圖 Dual-Side 4-Image 質檢體系）**：
+  * 每張卡牌進機檢驗時，光學感測陣列與四向分時頻閃光源協同作業，嚴格輸出 **雙面共 4 張 4K 級無反光圖像**：
+    1. **正面 4K 彩色掃描圖 (Front Color 4.0K RGB 48-bit)**：用於幾何居中率（Centering 50/50 比例計算）、印刷網點（Rosette pattern）、邊緣白邊（Edge/Corner Whitening）與原畫色彩飽和度核驗。
+    2. **正面 3D 表面光度立體浮雕圖 (Front Surface 4.0K Photometric Stereo Gray)**：消除原畫顏色與閃卡反光干擾，以 50% 中性灰（#808080）為基準重建微觀三維凹凸拓撲，用於微米級表面劃痕（Hairline Scratches）、壓痕、指紋、燙金壓印深度及印刷凸凹線精確測量。
+    3. **背面 4K 彩色掃描圖 (Back Color 4.0K RGB 48-bit)**：用於背面幾何居中、背面四角磨損與紙纖維白邊檢測。系統自動依據卡牌語言與版本（日版 vs 國際版）自動匹配正品真實背面（如日版 2001-Present 經典六色能量球宇宙星空背面 vs 國際版藍邊深渦背面）。
+    4. **背面 3D 表面光度立體浮雕圖 (Back Surface 4.0K Photometric Stereo Gray)**：用於背面指甲掐痕、壓痕凹陷、摩擦微劃痕等物理瑕疵的立體分析。
+* **5.1.3 GMS 工作台視圖模式與雙通道操作規格**：
+  1. **雙聯並排比對 (Dual Split View - 1:1 機台實機界面還原)**：默認視圖模式，左側展示 `CH-A · 4K 高清彩色`，右側展示 `CH-B · 3D 光度立體浮雕`。評級師可在單一畫布上同步觀察色彩瑕疵與物理微觀凹凸，兩側畫面保持 100% 幾何比例同步縮放（Zoom）與平移。
+  2. **彩色原圖模式 (Color Scan Mode)**：單幅大圖集中檢視卡面印刷精度、色彩漸變及外邊框幾何比例。
+  3. **3D表面浮雕模式 (Surface Relief Mode)**：單幅大圖高對比呈現表面微觀凹凸，表面劃痕與折痕以亮金琥珀色標記框（Surface Highlight）高亮鎖定。
+  4. **正/反面切換聯動 (Front/Back Switching)**：點擊「正面 / 背面」時，雙聯兩側同步切換對應面的彩色與浮雕圖，瑕疵層（Defect Layer）依據面別動態切換（正面攻擊欄/閃卡框瑕疵 vs 背面角落掉白/表面磨損瑕疵）。
+* **5.1.4 機台故障調度與掃描校準異常規範（嚴格對齊 Heidi 規範 H05 / H06）**：
+  * **H05 掃描儀故障與嚴禁翻拍打分**：若某台評級相機掃描儀故障停機或傳動中斷，操作員將卡牌轉移至另一台已校準的備用掃描儀繼續評級。**系統恪守 H05 紅線原則：絕不根據人工拍攝/手機翻拍的照片進行評級或真偽鑑定**，杜絕非標準光源與非校準視角的翻拍數據進入 AI 引擎。
+  * **H06 掃描儀每日校準防線**：每日例行校準檢查若未通過，系統自動鎖定該機台，禁止接收新評級任務。自上一次合格校準以來該機台所掃描的所有卡牌任務，一律強制打回重掃，確保微觀 4K 與 3D 浮雕數據的高保真度與法律憑證效力。
 
 ---
 
@@ -187,7 +209,7 @@ $$\text{Grade}_{\text{Raw}} = 0.35 \times \text{Centering} + 0.25 \times \text{S
   * 包含：正反面高解析度大圖、微距網點對比存證、四項子分比例、防偽溯源鏈。
 * **5.4.2 訂單完工判定**：
   * GMS 定時輪詢該訂單下的所有 Mission ID。
-  * **合流條件**：當訂單內全部單卡均達到 `PACKED` 或 `REJECTED_FAKE` 終態時，GMS 觸發 `GMS_ORDER_COMPLETED` Webhook，將整包數據推給 OMS，正式進入回寄物流包裝工序。
+  * **合流條件**：當訂單內全部單卡均達到 `PACKED` (標準封磚)、`PACKED_ALTERED` (AA 認證封磚)、`RETURN_RAW` (改卡偏好裸卡/無法評級裸卡退回) 或 `REJECTED_FAKE` (假卡標記退回) 終態時，GMS 觸發 `GMS_ORDER_COMPLETED` Webhook，將整包數據推給 OMS，推進至 `SLABING` / `READY_FOR_REVEAL`，正式進入在線查分與回寄發貨工序。
 
 ---
 
@@ -201,7 +223,7 @@ CREATE TABLE IF NOT EXISTS grading_missions (
     card_id TEXT NOT NULL,                     -- 關聯 CMS 卡庫 ID
     user_id TEXT NOT NULL,                     -- 送評用戶 ID
     declared_value REAL,                       -- 申報價值 (USD)
-    status TEXT NOT NULL,                      -- 'RECEIVED', 'SCANNED', 'AI_ANALYZED', 'HUMAN_REVIEW', 'APPROVED', 'PACKED', 'REJECTED_FAKE'
+    status TEXT NOT NULL,                      -- 'RECEIVED', 'SCANNED', 'AI_ANALYZED', 'HUMAN_REVIEW', 'APPROVED', 'PACKED', 'PACKED_ALTERED', 'RETURN_RAW', 'REJECTED_FAKE'
     ai_confidence REAL DEFAULT 0.0,            -- AI 綜合置信度
     assigned_grader TEXT,                      -- 分配的評級師 ID
     reviewed_by_manager TEXT,                  -- 審批的經理 ID
@@ -215,7 +237,7 @@ CREATE TABLE IF NOT EXISTS grading_missions (
 CREATE TABLE IF NOT EXISTS card_authentications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     mission_id TEXT NOT NULL,
-    verdict TEXT NOT NULL,                     -- 'AUTHENTIC', 'COUNTERFEIT', 'ALTERED'
+    verdict TEXT NOT NULL,                     -- 'AUTHENTIC', 'COUNTERFEIT', 'ALTERED', 'QUESTIONABLE'
     physical_spec_pass INTEGER DEFAULT 1,      -- 尺寸克重公差 (1/0)
     core_layer_detected TEXT,                  -- 'BLACK_CORE', 'BLUE_CORE', 'WHITE_CORE'
     rosette_pattern_pass INTEGER DEFAULT 1,    -- 玫瑰印刷網點 (1/0)
@@ -232,22 +254,25 @@ CREATE TABLE IF NOT EXISTS card_authentications (
 CREATE TABLE IF NOT EXISTS grading_results (
     cert_number TEXT PRIMARY KEY,              -- 證書號，如 'TGC-2026-88912'
     mission_id TEXT NOT NULL UNIQUE,
-    final_grade REAL NOT NULL,                 -- 最終總分 (1.0~10.0)
-    grade_name TEXT NOT NULL,                  -- 'Gem Mint', 'Mint', etc.
-    subgrade_centering REAL NOT NULL,          -- 居中度小分
-    subgrade_corners REAL NOT NULL,            -- 四角小分
-    subgrade_edges REAL NOT NULL,              -- 邊緣小分
-    subgrade_surface REAL NOT NULL,            -- 表面小分
+    final_grade REAL,                          -- 最終總分 (1.0~10.0；若為改卡 Authentic Altered 則為 NULL 或 0)
+    grade_name TEXT NOT NULL,                  -- 'Gem Mint 10', 'Mint 9', 'Authentic Altered (AA)' 等
+    subgrade_centering REAL,                   -- 居中度小分 (AA 磚可為 NULL 或實測參考)
+    subgrade_corners REAL,                     -- 四角小分
+    subgrade_edges REAL,                       -- 邊緣小分
+    subgrade_surface REAL,                     -- 表面小分
     front_ratio_lr TEXT,                       -- 正面左右比例 '52/48'
-    front_ratio_tb TEXT,                       -- 正面上Deprecated下比例 '51/49'
+    front_ratio_tb TEXT,                       -- 正面上下比例 '51/49'
     back_ratio_lr TEXT,                        -- 背面左右比例 '58/42'
     back_ratio_tb TEXT,                        -- 背面上下比例 '60/40'
-    override_reason TEXT,                      -- 觸發封頂說明 (折痕/水漬)
+    qualifiers TEXT,                           -- 修飾符，如 'OC', 'MK', 'None'
+    override_reason TEXT,                      -- 觸發封頂說明 (折痕/水漬/AA標註)
     ai_pre_grade REAL,                         -- AI 初評分
     human_adjust_reason TEXT,                  -- 人工調分理由標記
     graded_by TEXT NOT NULL,                   -- 簽署評級師 (Grader)
     approved_by TEXT NOT NULL,                 -- 終審經理 (Ops Manager)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(mission_id) REFERENCES grading_missions(id)
+);
+```
 );
 ```

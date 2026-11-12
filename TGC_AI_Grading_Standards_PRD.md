@@ -153,10 +153,12 @@ OCR 引擎內建專用卡牌字典（涵蓋英語、日語假名/漢字、繁體
   - 定位卡牌外邊緣物理裁切線與內邊框印刷圖案邊緣，測量上下邊界寬度（$T$ 與 $B$）及左右邊界寬度（$L$ 與 $R$）。
   - 計算比例：$Ratio_{LR} = \frac{\max(L, R)}{L + R} \times 100\%$、$Ratio_{TB} = \frac{\max(T, B)}{T + B} \times 100\%$。
 - **標準容差對應表**：
-  - **Grade 10 (Gem Mint)**：正面 $\le 55/45 \sim 60/40$，反面 $\le 75/25$。
-  - **Grade 9 (Mint)**：正面 $\le 65/35$，反面 $\le 85/15$。
-  - **Grade 8 (Near Mint-Mint)**：正面 $\le 70/30$，反面 $\le 90/10$。
-  - 超過 90/10 者自動標註 `OC` (Off-Center) 修飾標籤。
+  - **Grade 10 (Pristine / Gem Mint)**：正面 $50/50 \sim 55/45$，反面 $50/50 \sim 75/25$。
+  - **Grade 9.5 (Mint+)**：正面 $56/44 \sim 58/42$，反面 $\le 75/25$。
+  - **Grade 9.0 (Mint)**：正面 $59/41 \sim 60/40$，反面 $\le 80/20$。
+  - **Grade 8.5 (NM-MT+)**：正面 $61/39 \sim 63/37$，反面 $\le 85/15$。
+  - **Grade 8.0 (NM-MT)**：正面 $64/36 \sim 65/35$，反面 $\le 90/10$。
+  - 超過 75/25 者自動標註 `OC` (Off-Center) 修飾標籤。
 
 ### 5.2 邊角銳度 (Corners)
 - **算法機制**：
@@ -183,15 +185,18 @@ OCR 引擎內建專用卡牌字典（涵蓋英語、日語假名/漢字、繁體
     2. 凹陷與壓痕（Dent/Crease）：檢測表面光影畸變。
     3. 印刷瑕疵（Print Lines/Holo Foil Scratch）：區分原廠出廠印刷線與後天物理損傷。
     4. 髒污、指紋與斑點（Stains/Fingerprints）。
-- **標準容差**：
+- **標準容差與硬性封頂階梯 (Hard Overrides)**：
   - **Grade 10**：鏡面級純淨度，全息貼膜完美無霧化，允許單條小於 1mm 的極微弱出廠印刷壓線（不影響整體觀賞美感）。
   - **Grade 9**：無凹痕，無折痕，允許極細微髮絲刮痕（僅在特定強光斜射下可見）。
-  - **Grade 6 以下**：出現肉眼可見折痕、表面沾汙或凹坑。
+  - **正面壓痕封頂**：卡片正面肉眼可見凹痕/壓痕（Dent），總分強制封頂 **7.0 (Near Mint)**。
+  - **單處輕微折痕封頂**：出現單條輕度表面折痕（Minor Crease $< 1\text{ inch}$），總分強制封頂 **5.0 (Excellent)**。
+  - **多處/嚴重貫穿折痕封頂**：出現多條折痕或穿透性折痕，總分強制封頂 **4.0 (VG-EX)**。
 
 ### 5.5 綜合評分算法與修飾符 (Qualifiers Matrix)
 - **綜合得分判定**：
-  - 最終總分不直接取平均值，而是採用**「瓶頸限幅權重模型」**：
-  $$\text{Final Grade} = \min(\text{Corners}, \text{Edges}, \text{Surface}) \text{ 並受 } \text{Centering 門檻限制}$$
+  - 綜合評級採用**「加權算術平均 + 木桶短板封頂模型」**：
+  $$\text{Grade}_{\text{Raw}} = 0.35 \times \text{Centering} + 0.25 \times \text{Surface} + 0.20 \times \text{Corners} + 0.20 \times \text{Edges}$$
+  $$\text{Final Grade} \le \min(\text{Centering}, \text{Corners}, \text{Edges}, \text{Surface}) + 1.0$$
 - **特異修飾符定義 (Qualifiers)**：
   - `OC (Off-Center)`：中心嚴重偏移，但其他 3 維度達到高分標準。
   - `ST (Staining)`：卡面有水漬、油斑或不可逆化學沾污。
@@ -313,7 +318,7 @@ Web 官網中的「評級標準」模組（路由：`#grading_standards` 或 `#v
 | 異常情境 | 系統判定邏輯 | 處理流程與防禦策略 |
 | :--- | :--- | :--- |
 | **卡面嚴重彎曲 / 弧度過大** | 遠心鏡頭景深外焦點失焦率 > 15% | 提示「物理變形嚴重」，轉入人工柔性壓平緩衝工序，不強制執行機械加壓，避免折痕。 |
-| **疑似改卡 / 塗色修邊 (Altered)** | UV 光源下邊緣螢光波長異常，與原廠紙漿配方不符 | 系統標記 `E-ALTERED_EDGE`，拒絕評分（Not Gradable - Altered），退件並出具檢測異常報告。 |
+| **疑似改卡 / 塗色修邊 (Altered)** | 亞像素尺寸測量短縮 ≥0.30mm、UV 光源下邊緣螢光波長異常或截面二次修整 | 系統標記 `AUTHENTIC_ALTERED`，凍結數值評分（No Grade 1-10）。依據下單 A10 偏好封裝為專屬「Authentic Altered (AA)」認證卡磚或作為裸卡退回，費用不予退還（對齊 Heidi 規範 A10 / E04）。 |
 | **假卡 / 高仿卡 (Counterfeit)** | 微縮文字筆劃斷裂，網點角度與官方模板重合率 < 80% | 立即凍結訂單，在 GMS 與證書庫標註 `NOT_AUTHENTIC`，存檔高解析度樣品進入黑名單庫。 |
 | **全息防偽貼紙剝落** | 表面同軸光反射率歸零 | 標記缺陷修飾符或降級至 Authentic / 瑕疵等級處理。 |
 | **相機校準漂移** | 每日開機標準色卡檢測與標定，色差 $\Delta E > 1.2$ | 設備自動報警並鎖定評級流水線，直至維護人員完成黑白場重新校準。 |
